@@ -1,0 +1,8 @@
+Brandon Tran
+
+1. One paragraph summary of program:
+In this program, we will create a client and server for a game like hangman. A random string of characters will be generated at the start of the server, and each client will have as many guesses as there are characters in the word. Incorrect guesses decrement the count, while correct guesses leave it unchanged, and all instances of the guess are filled on the board. This goes on until guesses run out or the entire word is guessed. So in this assignment, I will create the server and client for the game using sockets. 
+
+2. I anticipate the most challenging part of the assignment to be creating a client and server and implementing the network aspects of this assignment. I’ve never worked with networks or anything involving creating a server and client, so this will all be new territory for me and I’ll probably struggle with that part. 
+
+3. If I get stuck on a part in this assignment, I’ll send an email to you to ask for help, check google and stackoverflow for similar issues, and check the book.
