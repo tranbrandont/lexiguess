@@ -4,6 +4,7 @@ import argparse
 import random
 import string
 import struct
+import os
 
 def server(port, word, ip):
     word, wordLen = hangman(word)
@@ -12,15 +13,20 @@ def server(port, word, ip):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host = socket.gethostname() # Get local machine name
     word = bytes(word, 'utf-8')
-    print(struct.pack('!8shh', word, wordLen, guesses))
+    package = struct.pack('!hh8s', wordLen, guesses, word)
+    print(struct.calcsize('!hh8s'))
+    print(package)
     s.bind((ip, port))        # Bind to the port
-    s.listen()                 # Now wait for client connection.
-    while True:
+    s.listen(10)                 # Now wait for client connection.
+    i = 1
+    while i <= 10:
         c, addr = s.accept()     # Establish connection with client. This where
-
-        print('Got connection')
-        c.send()
-        c.close()                # Close the connection
+        cid = os.fork()
+        if cid == 0:
+            c.send(package)
+            c.close()                # Close the connection
+        else:
+            i += 1
     s.close() # Closing server socket
 
 def client(port, ip):
@@ -28,8 +34,9 @@ def client(port, ip):
     host = socket.gethostname()  # Get local machine name
     print(host)
     s.connect((ip, port))
-    startWord = (s.recv(4, socket.MSG_WAITALL))  # this is where client (or server) waits, WAITALL blocks
-    print(startWord.decode())
+    startWord = (s.recv(12, socket.MSG_WAITALL))  # this is where client (or server) waits, WAITALL blocks
+    wordLen, guesses, word = struct.unpack('!hh8s', startWord)
+    print(wordLen, guesses, word)
     s.close  # Close the socket when done
 
 def hangman(word):
