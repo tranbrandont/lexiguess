@@ -13,8 +13,8 @@ def server(port, word, ip):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host = socket.gethostname() # Get local machine name
     word = bytes(word, 'utf-8')
-    package = struct.pack('!hh8s', wordLen, guesses, word)
-    print(struct.calcsize('!hh8s'))
+    package = struct.pack('!hh', wordLen, guesses)
+    print(struct.calcsize('!hh'))
     print(package)
     s.bind((ip, port))        # Bind to the port
     s.listen(10)                 # Now wait for client connection.
@@ -34,9 +34,12 @@ def client(port, ip):
     host = socket.gethostname()  # Get local machine name
     print(host)
     s.connect((ip, port))
-    startWord = (s.recv(12, socket.MSG_WAITALL))  # this is where client (or server) waits, WAITALL blocks
-    wordLen, guesses, word = struct.unpack('!hh8s', startWord)
-    print(wordLen, guesses, word)
+    startWord = (s.recv(4, socket.MSG_WAITALL))  # this is where client (or server) waits, WAITALL blocks
+    wordLen, guesses = struct.unpack('!hh', startWord)
+    gameWord = list('_' * wordLen)
+    while guesses > 0 and '_' in gameWord:
+        print ('Board: ', gameWord, '(',guesses, 'guesses left )')
+        guess = input('Enter guess: ')
     s.close  # Close the socket when done
 
 def hangman(word):
@@ -45,7 +48,7 @@ def hangman(word):
         for i in range(random.randint(1,8)):
             word += (random.choice(string.ascii_lowercase))
     wordLen = len(word)
-    return (word, wordLen)
+    return word, wordLen
 
 
 
