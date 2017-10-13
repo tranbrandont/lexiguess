@@ -5,22 +5,32 @@ import random
 import string
 import struct
 
-def server(port, word):
+def server(port, word, ip):
     word, wordLen = hangman(word)
     guesses = 3
     #startInfo = struct.pack('!', word, wordLen, guesses)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host = socket.gethostname() # Get local machine name
-    startword = word.encode('ascii')
-    s.bind((host, port))        # Bind to the port
+    word = bytes(word, 'utf-8')
+    print(struct.pack('!8shh', word, wordLen, guesses))
+    s.bind((ip, port))        # Bind to the port
     s.listen()                 # Now wait for client connection.
     while True:
         c, addr = s.accept()     # Establish connection with client. This where
 
         print('Got connection')
-        c.send(startword)
+        c.send()
         c.close()                # Close the connection
     s.close() # Closing server socket
+
+def client(port, ip):
+    s = socket.socket()  # Create a socket object
+    host = socket.gethostname()  # Get local machine name
+    print(host)
+    s.connect((ip, port))
+    startWord = (s.recv(4, socket.MSG_WAITALL))  # this is where client (or server) waits, WAITALL blocks
+    print(startWord.decode())
+    s.close  # Close the socket when done
 
 def hangman(word):
     if word is None:
@@ -45,19 +55,9 @@ def main():
     word = args.word
     ip = args.ip
     if mode == 'server':
-        server(port, word)
+        server(port, word, ip)
 
     else:
-        import socket  # Import socket module
-
-        s = socket.socket()  # Create a socket object
-        host = socket.gethostname()  # Get local machine name
-        print(host)
-        s.connect((host, port))
-        startWord = (s.recv(4, socket.MSG_WAITALL))  # this is where client (or server) waits, WAITALL blocks
-        print(startWord.decode())
-        s.close  # Close the socket when done
+        client(port, ip)
 
 main()
-
-
