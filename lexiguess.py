@@ -19,7 +19,7 @@ def server(port, word, ipnum):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     blankw = '_' * wordlen
     blankw = bytes(blankw, 'utf-8')
-    package = struct.pack('!b8s', guesses, blankw)
+    package = struct.pack('!b{:d}s'.format(wordlen), guesses, blankw)
     blankw = blankw.decode("utf-8")
     if ipnum is None:
         ipnum = socket.gethostname()
@@ -35,7 +35,7 @@ def server(port, word, ipnum):
             # accepts guesses and sends updated info to client until word is
             # guessed or player runs out of guesses
             while blankw != word and guesses > 0:
-                guess = recv(con)
+                _psize, guess = recv(con)
                 guess = struct.unpack('!s', guess)
                 guess = list(guess[0].decode("utf-8"))
                 if guess[0] in word and guess[0] not in blankw:
@@ -48,7 +48,7 @@ def server(port, word, ipnum):
                 else:
                     guesses -= 1
                 blankw = bytes(blankw, 'utf-8')
-                package = struct.pack('!b8s', guesses, blankw)
+                package = struct.pack('!b{:d}s'.format(wordlen), guesses, blankw)
                 send(con, package)
                 blankw = blankw.decode("utf-8")
                 closeconnection(con)                # Close the connection
@@ -64,12 +64,12 @@ def client(port, ipnum):
     if ipnum is None:
         ipnum = socket.gethostname()
     sock.connect((ipnum, port))
-    startword = recv(sock)
-    guesses, gameword = struct.unpack('!b8s', startword)
-    gameword = gameword.decode("utf-8")
+    wordlen, startword = recv(sock)
+    guesses, gamewrd = struct.unpack('!b{:d}s'.format(wordlen-1), startword)
+    gamewrd = gamewrd.decode("utf-8")
     #keeps guessing until player runs out of guesses or word is guessed
-    while guesses > 0 and '_' in gameword:
-        print('Board: ', gameword, '(', guesses, 'guesses left )')
+    while guesses > 0 and '_' in gamewrd:
+        print('Board: ', gamewrd, '(', guesses, 'guesses left )')
         guess = ''
         while len(guess) != 1:
             guess = input('Enter guess: ')
@@ -77,10 +77,10 @@ def client(port, ipnum):
         guess = str.encode(guess)
         message = struct.pack('!s', guess)
         send(sock, message)
-        startword = recv(sock)
-        guesses, gameword = struct.unpack('!b8s', startword)
-        gameword = gameword.decode("utf-8")
-    print('Board: ', gameword)
+        wordlen, startword = recv(sock)
+        guesses, gamewrd = struct.unpack('!b{:d}s'.format(wordlen-1), startword)
+        gamewrd = gamewrd.decode("utf-8")
+    print('Board: ', gamewrd)
     if guesses > 0:
         print('You won')
     else:
@@ -89,11 +89,10 @@ def client(port, ipnum):
 
 def recv(connection):
     """reads size of incoming packet and then reads packet"""
-    connection.settimeout(10)
     try:
         psize = connection.recv(4, socket.MSG_WAITALL)
         psize = struct.unpack('!i', psize)
-        return connection.recv(psize[0], socket.MSG_WAITALL)
+        return psize[0], connection.recv(psize[0], socket.MSG_WAITALL)
     except TimeoutError:
         print("Timeout")
 
