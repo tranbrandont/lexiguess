@@ -7,6 +7,7 @@ import string
 import struct
 import os
 import sys
+import atexit
 
 
 
@@ -50,10 +51,11 @@ def server(port, word, ipnum):
                 package = struct.pack('!b8s', guesses, blankw)
                 send(con, package)
                 blankw = blankw.decode("utf-8")
-            con.close()                # Close the connection
+                closeconnection(con)                # Close the connection
         else:
             i += 1
-    sock.close()
+        closeconnection(sock)
+    atexit.register(closeconnection(sock))
 
 
 def client(port, ipnum):
@@ -94,6 +96,11 @@ def recv(connection):
         return connection.recv(psize[0], socket.MSG_WAITALL)
     except TimeoutError:
         print("Timeout")
+
+
+def closeconnection(connection):
+    """closes the socket"""
+    connection.close()
 
 
 def send(connection, message):

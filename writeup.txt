@@ -1,0 +1,7 @@
+Brandon Tran
+
+I have not noticed any parts of my client or server that do not work, although there might be a part that breaks from extensive testing. 
+
+I tested that my code was working by first initially running the program using the arguments provided in the lexiguess spec pdf. Then, I ran the program using different words, longer words, and words that repeated letters. After that, I tested the try except blocks by manually giving incorrect numbers for the size of the incoming packet. 
+
+I think the most challenging part of the assignment was the initial handling of a server and client relationship and learning how to create the game over the network because I've never done any coding related to networks and I had no experience with this, and I needed to do a lot of background reading to learn about how to start this assignment.
