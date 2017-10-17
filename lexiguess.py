@@ -90,7 +90,6 @@ def client(port, ipnum):
 
 def recv(connection):
     """reads size of incoming packet and then reads packet"""
-    connection.settimeout(5)
     try:
         psize = connection.recv(4, socket.MSG_WAITALL)
         psize = struct.unpack('!i', psize)
