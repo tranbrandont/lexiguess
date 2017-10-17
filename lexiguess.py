@@ -26,7 +26,7 @@ def server(port, word, ipnum):
     sock.bind((ipnum, port))
     sock.listen(10)                 # Now wait for client connection.
     i = 1
-    while i <= 10:
+    while i <= 10:\
         # allows up to 10 connections to game
         con, _addr = sock.accept()
         cid = os.fork()
@@ -51,10 +51,10 @@ def server(port, word, ipnum):
                 package = struct.pack('!b{:d}s'.format(wordlen), guesses, blankw)
                 send(con, package)
                 blankw = blankw.decode("utf-8")
-                closeconnection(con)                # Close the connection
+            closeconnection(con)                # Close the connection
         else:
             i += 1
-        closeconnection(sock)
+    closeconnection(sock)
     atexit.register(closeconnection(sock))
 
 
