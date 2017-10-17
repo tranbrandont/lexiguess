@@ -85,6 +85,7 @@ def client(port, ipnum):
         print('You won')
     else:
         print('You lost')
+    closeconnection(sock)
 
 
 def recv(connection):
