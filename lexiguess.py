@@ -89,6 +89,7 @@ def client(port, ipnum):
 
 def recv(connection):
     """reads size of incoming packet and then reads packet"""
+    connection.settimeout(5)
     try:
         psize = connection.recv(4, socket.MSG_WAITALL)
         psize = struct.unpack('!i', psize)
@@ -119,7 +120,7 @@ def main():
     )
     parser.add_argument('--port', type=int, required=True, help='port number')
     parser.add_argument('--word', help='word to be guessed')
-    parser.add_argument('--ip', required=True, help='IP address for client')
+    parser.add_argument('--ip', help='IP address for client')
     args = parser.parse_args()
     mode = args.mode
     port = args.port
